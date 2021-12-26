@@ -396,6 +396,30 @@ func DeleteOrderControllers(c echo.Context) error <span class="cov8" title="0">{
 
         return c.JSON(http.StatusOK, response.SuccessResponseNonData("Success Operation"))</span>
 }
+
+func CreateOrderControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return CreateOrderControllers
+}</span>
+
+func GetOrderByIdOrderControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return GetOrderByIdOrderControllers
+}</span>
+
+func GetOrderByIdGroupControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return GetOrderByIdGroupControllers
+}</span>
+
+func GetOrderByIdUsersControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return GetOrderByIdUsersControllers
+}</span>
+
+func UpdateOrderControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return UpdateOrderControllers
+}</span>
+
+func DeleteOrderControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return DeleteOrderControllers
+}</span>
 </pre>
 		
 		<pre class="file" id="file2" style="display: block;">package controllers
