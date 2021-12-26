@@ -717,36 +717,36 @@ func UpdateUserControllers(c echo.Context) error <span class="cov0" title="0">{
         <span class="cov0" title="0">if len(users.Password) &lt; 6 </span><span class="cov0" title="0">{
                 return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Password must consist of 6 characters or more"))
         }</span>
-        <span class="cov0" title="0">er = v.Var(users.Phone, "required,e164")
-        if er != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="0">er = v.Var(users.Phone, "required,e164")
+        if er != nil </span><span class="cov8" title="0">{
                 return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Telephone Number"))
         }</span>
-        <span class="cov0" title="0">if users.Email == "admin@admin.com" </span><span class="cov0" title="0">{
+        <span class="cov8" title="0">if users.Email == "admin@admin.com" </span><span class="cov8" title="0">{
                 users.Role = "admin"
-        }</span> else<span class="cov0" title="0"> {
+        }</span> else<span class="cov8" title="0"> {
                 users.Role = "customer"
         }</span>
-        <span class="cov0" title="0">if er == nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="0">if er == nil </span><span class="cov8" title="0">{
                 users.Password, _ = helper.HashPassword(users.Password) // generate plan password menjadi hash
                 _, er = databases.UpdateUser(id, &amp;users)
         }</span>
-        <span class="cov0" title="0">if er != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="0">if er != nil </span><span class="cov8" title="0">{
                 return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Email or Telephone Number Already Exist"))
         }</span>
         <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseNonData("Success Operation"))</span>
 }
 
 // controller untuk login dan generate token (by email dan password)
-func LoginUserControllers(c echo.Context) error <span class="cov0" title="0">{
+func LoginUserControllers(c echo.Context) error <span class="cov8" title="0">{
         user := models.Users{}
         c.Bind(&amp;user)
         plan_pass := user.Password
         log.Println(plan_pass)
         token, e := databases.LoginUser(plan_pass, &amp;user)
-        if e != nil </span><span class="cov0" title="0">{
+        if e != nil </span><span class="cov8" title="0">{
                 return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Email or Password Incorrect"))
         }</span>
-        <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Login Success", token))</span>
+        <span class="cov8" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Login Success", token))</span>
 }
 
 // controller untuk kebutuhan testing get user
