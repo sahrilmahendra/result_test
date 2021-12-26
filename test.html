@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<!-- saved from url=(0079)file:///C:/Users/Shaneki/AppData/Local/Temp/cover2904305049/coverage.html#file2 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<title>controllers: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">final-project/controllers/group_product_controllers.go (100.0%)</option>
+				
+				<option value="file1">final-project/controllers/order_controllers.go (0.0%)</option>
+				
+				<option value="file2">final-project/controllers/products_controllers.go (100.0%)</option>
+				
+				<option value="file3">final-project/controllers/users_controllers.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none;">package controllers
+
+import (
+        "final-project/lib/databases"
+        "final-project/middlewares"
+        "final-project/models"
+        response "final-project/responses"
+        "net/http"
+        "strconv"
+        "time"
+
+        "github.com/labstack/echo/v4"
+)
+
+// controller untuk menambahkan user (registrasi)
+func CreateGroupProductControllers(c echo.Context) error <span class="cov8" title="1">{
+        new_group := models.GroupProduct{}
+        id := c.Param("id_products")
+        c.Bind(&amp;new_group)
+
+        id_user, role := middlewares.ExtractTokenId(c)
+        if role == "admin" </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+
+        <span class="cov8" title="1">id_product, err := strconv.Atoi(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+
+        <span class="cov8" title="1">duration := time.Now().AddDate(0, 0, 14)
+        //mengambil banyaknya jumlah data yang ada pada group
+        _, len_group, _ := databases.GetAllGroupProduct()
+        name, price, limit, _ := databases.GetDataProduct(int(id_product))
+        fee := 5000
+
+        new_group.UsersID = uint(id_user)
+        new_group.ProductsID = uint(id_product)
+        new_group.NameGroupProduct = name + "-" + strconv.Itoa(len_group+1)
+        new_group.CapacityGroupProduct = 0
+        new_group.AdminFee = fee
+        new_group.TotalPrice = (price / limit) + fee
+        new_group.DurationGroup = duration.Format("02-01-2006")
+        new_group.Status = "Available"
+
+        d, er := databases.CreateGroupProduct(&amp;new_group, new_group.ProductsID)
+        if er != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov8" title="1">if name == "" || price == 0 </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Id Product Not Found"))
+        }</span>
+
+        <span class="cov8" title="1">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", d))</span>
+}
+
+func GetByIdGroupProductControllers(c echo.Context) error <span class="cov8" title="1">{
+        id := c.Param("id_group")
+        id_group_product, err := strconv.Atoi(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov8" title="1">data, e := databases.GetGroupProductById(id_group_product)
+        if e != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov8" title="1">if data == nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov8" title="1">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
+}
+func GetByIdProductsGroupProductControllers(c echo.Context) error <span class="cov8" title="1">{
+        id := c.Param("id_products")
+        id_products, err := strconv.Atoi(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov8" title="1">data, e := databases.GetGroupProductByIdProducts(id_products)
+        if e != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov8" title="1">if data == nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov8" title="1">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
+}
+
+// controller untuk menampilkan seluruh data users
+func GetAllGroupProductControllers(c echo.Context) error <span class="cov8" title="1">{
+        data, _, err := databases.GetAllGroupProduct()
+        if err != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov8" title="1">if data == nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov8" title="1">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
+}
+
+func GetAvailableGroupProductControllers(c echo.Context) error <span class="cov8" title="1">{
+        status := c.Param("status")
+        if status != "available" </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Param"))
+        }</span>
+        <span class="cov8" title="1">data, e := databases.GetGroupProductByAvailable(status)
+        if e != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov8" title="1">if data == nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov8" title="1">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
+}
+
+func DeleteGroupProductControllers(c echo.Context) error <span class="cov8" title="1">{
+        id, err := strconv.Atoi(c.Param("id_group"))
+        logged, role := middlewares.ExtractTokenId(c) // check token
+        if logged != id &amp;&amp; role != "admin" </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov8" title="1">data_order, _, _ := databases.GetOrderByIdGroup(id)
+        if data_order != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access is denied ID data is in the order"))
+        }</span>
+        <span class="cov8" title="1">data, _ := databases.GetGroupProductById(id)
+        if data == nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov8" title="1">databases.DeleteGroupProduct(id)
+
+        return c.JSON(http.StatusOK, response.SuccessResponseNonData("Success Operation"))</span>
+}
+
+func DeleteGroupProductControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return DeleteGroupProductControllers
+}</span>
+func CreateGroupProductControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return CreateGroupProductControllers
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package controllers
+
+import (
+        "final-project/lib/databases"
+        "final-project/middlewares"
+        "final-project/models"
+        response "final-project/responses"
+        "net/http"
+        "regexp"
+        "strconv"
+
+        validator "github.com/go-playground/validator/v10"
+        "github.com/labstack/echo/v4"
+)
+
+func CreateOrderControllers(c echo.Context) error <span class="cov0" title="0">{
+        new_order := models.Order{}
+        new_payment := models.ResPayment{}
+        id_group, er := strconv.Atoi(c.Param("id_group"))
+        if er != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+
+        <span class="cov0" title="0">c.Bind(&amp;new_payment)
+        v := validator.New()
+        var len_phone = len(new_payment.Phone)
+
+        id_user, role := middlewares.ExtractTokenId(c)
+        t_price, _, _, n_product, status, er := databases.GetDataGroupProductById(id_group)
+
+        new_order.UsersID = uint(id_user)
+        new_order.GroupProductID = uint(id_group)
+        new_order.PriceOrder = t_price
+        new_order.NameProduct = n_product
+        new_order.DetailCredential = "Email: , Password: "
+
+        // mengecek apakah user sudah tergabung di group
+        cek, e := databases.CekUserInGroup(uint(id_group), uint(id_user))
+        if er != nil || e != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov0" title="0">if cek != 0 || role == "admin" </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov0" title="0">erro := v.Var(new_payment.Phone, "required")
+        if erro != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Telephone Number"))
+        }</span>
+        <span class="cov0" title="0">if len_phone &lt; 11 || len_phone &gt; 13 </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Telephone Number"))
+        }</span>
+        <span class="cov0" title="0">if !regexp.MustCompile(`^08[1-9][0-9].*$`).MatchString(new_payment.Phone) </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Telephone Number"))
+        }</span> else<span class="cov0" title="0"> {
+
+                data, err := databases.CreateOrder(&amp;new_payment, &amp;new_order, id_group)
+
+                if data == nil || t_price == 0 </span><span class="cov0" title="0">{
+                        return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Id Group Product Not Found"))
+                }</span>
+                <span class="cov0" title="0">if status != "Available" </span><span class="cov0" title="0">{
+                        return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Group Product Full"))
+                }</span>
+                <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                        return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+                }</span>
+                <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
+        }
+}
+
+func GetOrderByIdOrderControllers(c echo.Context) error <span class="cov0" title="0">{
+        id_order, err := strconv.Atoi(c.Param("id_order"))
+        if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov0" title="0">token, role := middlewares.ExtractTokenId(c)
+
+        data, e, id_user := databases.GetOrderByIdOrder(id_order)
+        if id_user != uint(token) &amp;&amp; role != "admin" </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov0" title="0">if data == nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov0" title="0">if e != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
+}
+
+func GetOrderByIdGroupControllers(c echo.Context) error <span class="cov0" title="0">{
+        id_group, err := strconv.Atoi(c.Param("id_group"))
+        if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov0" title="0">_, role := middlewares.ExtractTokenId(c)
+
+        data, e, _ := databases.GetOrderByIdGroup(id_group)
+        if role != "admin" </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov0" title="0">if data == nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov0" title="0">if e != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
+}
+
+func GetOrderByIdUsersControllers(c echo.Context) error <span class="cov0" title="0">{
+        id_user, err := strconv.Atoi(c.Param("id_user"))
+        if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov0" title="0">token, role := middlewares.ExtractTokenId(c)
+
+        data, e := databases.GetOrderByIdUser(id_user)
+        if token != id_user &amp;&amp; role != "admin" </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov0" title="0">if data == nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov0" title="0">if e != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
+}
+
+func UpdateOrderControllers(c echo.Context) error <span class="cov0" title="0">{
+        detail := models.Detail{}
+        id_order, err := strconv.Atoi(c.Param("id_order"))
+        if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov0" title="0">c.Bind(&amp;detail)
+
+        _, role := middlewares.ExtractTokenId(c)
+        if role != "admin" </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+
+        <span class="cov0" title="0">v := validator.New()
+        erro := v.Var(detail.DetailCredential, "required")
+        if erro != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Details Can't Be Empty"))
+        }</span>
+
+        <span class="cov0" title="0">cek, _, _ := databases.GetOrderByIdOrder(id_order)
+        if cek == nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+
+        <span class="cov0" title="0">data, e := databases.UpdateOrderDetail(id_order, detail.DetailCredential)
+        if e != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
+}
+
+func DeleteOrderControllers(c echo.Context) error <span class="cov0" title="0">{
+        id, err := strconv.Atoi(c.Param("id_order"))
+        if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov0" title="0">logged, role := middlewares.ExtractTokenId(c) // check token
+        if logged != id &amp;&amp; role != "admin" </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov0" title="0">data, _, _ := databases.GetOrderByIdOrder(id)
+        if data == nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov0" title="0">databases.DeleteOrder(id)
+
+        return c.JSON(http.StatusOK, response.SuccessResponseNonData("Success Operation"))</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: block;">package controllers
+
+import (
+        "final-project/lib/databases"
+        "final-project/middlewares"
+        "final-project/models"
+        response "final-project/responses"
+        "net/http"
+        "strconv"
+
+        validator "github.com/go-playground/validator/v10"
+        "github.com/labstack/echo/v4"
+)
+
+type ValidatorProduct struct {
+        Name_Product   string `validate:"required"`
+        Detail_Product string `validate:"required"`
+        Price          int    `validate:"required,gt=0"`
+        Limit          int    `validate:"required,gt=1"`
+        Photo          string `validate:"required"`
+        Url            string `validate:"required"`
+}
+
+// controller untuk menampilkan seluruh data product
+func GetAllProductControllers(c echo.Context) error <span class="cov8" title="1">{
+        product, err := databases.GetAllProduct()
+        if err != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov8" title="1">if product == nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov8" title="1">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", product))</span>
+}
+
+// controller untuk menampilkan data product by id
+func GetProductByIdControllers(c echo.Context) error <span class="cov8" title="1">{
+        id, err := strconv.Atoi(c.Param("id"))
+        if err != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov8" title="1">product, e := databases.GetProductById(id)
+        if e != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov8" title="1">if product == nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov8" title="1">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", product))</span>
+}
+
+// var storageClient *storage.Client
+
+// controller untuk menambahkan product baru
+func CreateProductControllers(c echo.Context) error <span class="cov8" title="1">{
+        new_product := models.Products{}
+        c.Bind(&amp;new_product)
+
+        v := validator.New()
+        validasi_product := ValidatorProduct{
+                Name_Product:   new_product.Name_Product,
+                Price:          new_product.Price,
+                Detail_Product: new_product.Detail_Product,
+                Limit:          new_product.Limit,
+                Photo:          new_product.Photo,
+                Url:            new_product.Url,
+        }
+        err := v.Struct(validasi_product)
+        if err == nil </span><span class="cov8" title="1">{
+                id_user_token, role := middlewares.ExtractTokenId(c)
+                new_product.UsersID = uint(id_user_token)
+                if role != "admin" </span><span class="cov8" title="1">{
+                        return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+                }</span>
+                // log.Println("role", role)
+                <span class="cov8" title="1">_, err = databases.CreateProduct(&amp;new_product)</span>
+        }
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                // log.Println("error", err)
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov8" title="1">return c.JSON(http.StatusOK, response.SuccessResponseNonData("Success Operation"))</span>
+}
+
+// controller untuk memperbarui data product by id
+func UpdateProductControllers(c echo.Context) error <span class="cov8" title="1">{
+        id, err := strconv.Atoi(c.Param("id"))
+        _, role := middlewares.ExtractTokenId(c) // check token
+        if role != "admin" </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov8" title="1">product, _ := databases.GetProductById(id)
+        if product == nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov8" title="1">update_product := models.Products{}
+        c.Bind(&amp;update_product)
+        update_product.UsersID = uint(id)
+
+        v := validator.New()
+        validasi_product := ValidatorProduct{
+                Name_Product:   update_product.Name_Product,
+                Price:          update_product.Price,
+                Detail_Product: update_product.Detail_Product,
+                Limit:          update_product.Limit,
+                Photo:          update_product.Photo,
+                Url:            update_product.Url,
+        }
+        err = v.Struct(validasi_product)
+        if err == nil </span><span class="cov8" title="1">{
+                _, err = databases.UpdateProduct(id, &amp;update_product)
+        }</span>
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                // log.Println("error", err)
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov8" title="1">return c.JSON(http.StatusOK, response.SuccessResponseNonData("Success Operation"))</span>
+}
+
+// controller untuk menghapus data product by id
+func DeleteProductControllers(c echo.Context) error <span class="cov8" title="1">{
+        id, err := strconv.Atoi(c.Param("id"))
+        _, role := middlewares.ExtractTokenId(c)
+        if role != "admin" </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov8" title="1">data_group_product, _ := databases.GetGroupProductByIdProducts(id)
+        if data_group_product != nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access is denied ID data is in the group product"))
+        }</span>
+        <span class="cov8" title="1">product, _ := databases.GetProductById(id)
+        if product == nil </span><span class="cov8" title="1">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov8" title="1">databases.DeleteProduct(id)
+        return c.JSON(http.StatusOK, response.SuccessResponseNonData("Success Operation"))</span>
+}
+
+func DeleteProductControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return DeleteProductControllers
+}</span>
+func CreateProductControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return CreateProductControllers
+}</span>
+func UpdateProductControllersTesting() echo.HandlerFunc <span class="cov8" title="1">{
+        return UpdateProductControllers
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package controllers
+
+import (
+        "final-project/helper"
+        "final-project/lib/databases"
+        "final-project/middlewares"
+        "final-project/models"
+        response "final-project/responses"
+        "log"
+        "net/http"
+        "regexp"
+        "strconv"
+
+        validator "github.com/go-playground/validator/v10"
+        "github.com/labstack/echo/v4"
+)
+
+// controller untuk menampilkan seluruh data users
+func GetAllUsersControllers(c echo.Context) error <span class="cov0" title="0">{
+        _, role := middlewares.ExtractTokenId(c) // check token
+        if role != "admin" </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov0" title="0">users, err := databases.GetAllUsers()
+        if users == nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", users))</span>
+}
+
+// controller untuk menampilkan data user by id
+func GetUserControllers(c echo.Context) error <span class="cov0" title="0">{
+        id := c.Param("id")
+        conv_id, err := strconv.Atoi(id)
+        logged, role := middlewares.ExtractTokenId(c) // check token
+        if logged != conv_id &amp;&amp; role != "admin" </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov0" title="0">user, e := databases.GetUserById(conv_id)
+        if user == nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov0" title="0">if e != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", user))</span>
+}
+
+// controller untuk menambahkan user (registrasi) next
+func CreateUserControllers(c echo.Context) error <span class="cov0" title="0">{
+        new_user := models.Users{}
+        c.Bind(&amp;new_user)
+
+        v := validator.New()
+        err := v.Var(new_user.Name, "required")
+        if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Name"))
+        }</span>
+        <span class="cov0" title="0">if !regexp.MustCompile("^[0-9A-Za-z_.]+$").MatchString(new_user.Name) </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Name can only contains alphanumeric"))
+        }</span>
+        <span class="cov0" title="0">err = v.Var(new_user.Email, "required,email")
+        if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Email"))
+        }</span>
+        <span class="cov0" title="0">err = v.Var(new_user.Password, "required")
+        if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Password"))
+        }</span>
+        <span class="cov0" title="0">if len(new_user.Password) &lt; 6 </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Password must consist of 6 characters or more"))
+        }</span>
+        <span class="cov0" title="0">err = v.Var(new_user.Phone, "required,e164")
+        if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Telephone Number"))
+        }</span>
+        <span class="cov0" title="0">if new_user.Email == "admin@admin.com" </span><span class="cov0" title="0">{
+                new_user.Role = "admin"
+        }</span> else<span class="cov0" title="0"> {
+                new_user.Role = "customer"
+        }</span>
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                new_user.Password, _ = helper.HashPassword(new_user.Password) // generate plan password menjadi hash
+                _, err = databases.CreateUser(&amp;new_user)
+        }</span>
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Email or Telephone Number Already Exist"))
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseNonData("Success Operation"))</span>
+}
+
+// controller untuk menghapus user by id
+func DeleteUserControllers(c echo.Context) error <span class="cov0" title="0">{
+        id, err := strconv.Atoi(c.Param("id"))
+        logged, role := middlewares.ExtractTokenId(c) // check token
+        if logged != id &amp;&amp; role != "admin" </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov0" title="0">product, _ := databases.GetProductByIdUser(id)
+        if product != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access is denied ID data is in the users"))
+        }</span>
+        <span class="cov0" title="0">group_product, _ := databases.GetGroupProductByIdUser(id)
+        if group_product != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access is denied ID data is in the group product"))
+        }</span>
+        <span class="cov0" title="0">order, _ := databases.GetOrderByIdUser(id)
+        if order == nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access is denied ID data is in the order"))
+        }</span>
+        <span class="cov0" title="0">user, _ := databases.GetUserById(id)
+        if user == nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov0" title="0">databases.DeleteUser(id)
+
+        return c.JSON(http.StatusOK, response.SuccessResponseNonData("Success Operation"))</span>
+}
+
+// controller untuk memperbarui data user by id (update)
+func UpdateUserControllers(c echo.Context) error <span class="cov0" title="0">{
+        id, err := strconv.Atoi(c.Param("id"))
+        logged, role := middlewares.ExtractTokenId(c) // check token
+        if logged != id &amp;&amp; role != "admin" </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
+        }</span>
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Id"))
+        }</span>
+        <span class="cov0" title="0">user, _ := databases.GetUserById(id)
+        if user == nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
+        }</span>
+        <span class="cov0" title="0">users := models.Users{}
+        c.Bind(&amp;users)
+
+        v := validator.New()
+        er := v.Var(users.Name, "required")
+        if er != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Name"))
+        }</span>
+        <span class="cov0" title="0">if !regexp.MustCompile("^[0-9A-Za-z_.]+$").MatchString(users.Name) </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Name can only contains alphanumeric"))
+        }</span>
+        <span class="cov0" title="0">er = v.Var(users.Email, "required,email")
+        if er != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Email"))
+        }</span>
+        <span class="cov0" title="0">er = v.Var(users.Password, "required")
+        if er != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Password"))
+        }</span>
+        <span class="cov0" title="0">if len(users.Password) &lt; 6 </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Password must consist of 6 characters or more"))
+        }</span>
+        <span class="cov0" title="0">er = v.Var(users.Phone, "required,e164")
+        if er != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Invalid Telephone Number"))
+        }</span>
+        <span class="cov0" title="0">if users.Email == "admin@admin.com" </span><span class="cov0" title="0">{
+                users.Role = "admin"
+        }</span> else<span class="cov0" title="0"> {
+                users.Role = "customer"
+        }</span>
+        <span class="cov0" title="0">if er == nil </span><span class="cov0" title="0">{
+                users.Password, _ = helper.HashPassword(users.Password) // generate plan password menjadi hash
+                _, er = databases.UpdateUser(id, &amp;users)
+        }</span>
+        <span class="cov0" title="0">if er != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Email or Telephone Number Already Exist"))
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseNonData("Success Operation"))</span>
+}
+
+// controller untuk login dan generate token (by email dan password)
+func LoginUserControllers(c echo.Context) error <span class="cov0" title="0">{
+        user := models.Users{}
+        c.Bind(&amp;user)
+        plan_pass := user.Password
+        log.Println(plan_pass)
+        token, e := databases.LoginUser(plan_pass, &amp;user)
+        if e != nil </span><span class="cov0" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Email or Password Incorrect"))
+        }</span>
+        <span class="cov0" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Login Success", token))</span>
+}
+
+// controller untuk kebutuhan testing get user
+func GetUserControllersTesting() echo.HandlerFunc <span class="cov0" title="0">{
+        return GetUserControllers
+}</span>
+
+// controller untuk kebutuhan testing update user
+func UpdateUserControllersTesting() echo.HandlerFunc <span class="cov0" title="0">{
+        return UpdateUserControllers
+}</span>
+
+// controller untuk kebutuhan testing delete user
+func DeleteUserControllersTesting() echo.HandlerFunc <span class="cov0" title="0">{
+        return DeleteUserControllers
+}</span>
+</pre>
+		
+		</div>
+	
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+
+</body></html>
