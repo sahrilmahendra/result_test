@@ -299,11 +299,11 @@ func GetOrderByIdOrderControllers(c echo.Context) error <span class="cov8" title
         if id_user != uint(token) &amp;&amp; role != "admin" </span><span class="cov8" title="0">{
                 return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
         }</span>
+	<span class="cov8" title="0">if e != nil </span><span class="cov8" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
         <span class="cov8" title="0">if data == nil </span><span class="cov8" title="0">{
                 return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
-        }</span>
-        <span class="cov8" title="0">if e != nil </span><span class="cov8" title="0">{
-                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
         }</span>
         <span class="cov8" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
 }
@@ -319,11 +319,11 @@ func GetOrderByIdGroupControllers(c echo.Context) error <span class="cov8" title
         if role != "admin" </span><span class="cov8" title="0">{
                 return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
         }</span>
+	<span class="cov8" title="0">if e != nil </span><span class="cov8" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
         <span class="cov8" title="0">if data == nil </span><span class="cov8" title="0">{
                 return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
-        }</span>
-        <span class="cov8" title="0">if e != nil </span><span class="cov8" title="0">{
-                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
         }</span>
         <span class="cov8" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
 }
@@ -339,11 +339,11 @@ func GetOrderByIdUsersControllers(c echo.Context) error <span class="cov8" title
         if token != id_user &amp;&amp; role != "admin" </span><span class="cov8" title="0">{
                 return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Access Forbidden"))
         }</span>
+	<span class="cov8" title="0">if e != nil </span><span class="cov8" title="0">{
+                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
+        }</span>
         <span class="cov8" title="0">if data == nil </span><span class="cov8" title="0">{
                 return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Data Not Found"))
-        }</span>
-        <span class="cov8" title="0">if e != nil </span><span class="cov8" title="0">{
-                return c.JSON(http.StatusBadRequest, response.BadRequestResponse("Bad Request"))
         }</span>
         <span class="cov8" title="0">return c.JSON(http.StatusOK, response.SuccessResponseData("Success Operation", data))</span>
 }
